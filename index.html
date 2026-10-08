@@ -1,0 +1,144 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Smart ASHA/ANM Visit Scheduler</title>
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+<header>
+  <h1>Smart ASHA/ANM Visit Scheduling System</h1>
+  <p>Community Health Worker Visit Scheduling Optimizer with Risk-Weighted Prioritization</p>
+  <nav>
+    <a href="#dashboard">Dashboard</a>
+    <a href="#patients">Patients</a>
+    <a href="#workers">Workers</a>
+    <a href="#schedule">Schedule</a>
+    <a href="#algorithm">Risk Algorithm</a>
+  </nav>
+</header>
+
+<main>
+  <div id="toast" role="status"></div>
+
+  <!-- DASHBOARD -->
+  <section id="dashboard" class="view">
+    <div class="cards" id="stats"></div>
+    <div class="panel">
+      <h2>Top Priority Patients</h2>
+      <div id="topList"></div>
+    </div>
+    <div class="panel">
+      <button class="btn secondary" id="seedBtn">Load sample data</button>
+      <button class="btn danger" id="clearBtn">Clear all data</button>
+    </div>
+  </section>
+
+  <!-- PATIENTS -->
+  <section id="patients" class="view">
+    <div class="panel">
+      <h2>Add Patient</h2>
+      <form id="patientForm" class="grid">
+        <label>Name* <input name="name" required></label>
+        <label>Age <input name="age" type="number" min="0" max="120"></label>
+        <label>Gender
+          <select name="gender"><option>Female</option><option>Male</option><option>Other</option></select>
+        </label>
+        <label>Village* <input name="village" required></label>
+        <label>Location / Landmark <input name="location"></label>
+        <label>Pregnancy status
+          <select name="pregnancy">
+            <option value="none">Not pregnant</option>
+            <option value="normal">Pregnant (normal)</option>
+            <option value="high">High-risk pregnancy</option>
+          </select>
+        </label>
+        <label>Child status
+          <select name="child">
+            <option value="none">Not applicable</option>
+            <option value="normal">Child (healthy)</option>
+            <option value="newborn">Newborn</option>
+            <option value="malnutrition">Severe malnutrition</option>
+          </select>
+        </label>
+        <label>Health conditions <input name="conditions" placeholder="e.g. Diabetes, TB"></label>
+        <label>Previous visits <input name="previousVisits" type="number" min="0" value="0"></label>
+        <label>Last visit date <input name="lastVisit" type="date"></label>
+        <label>Next due visit <input name="nextDue" type="date"></label>
+        <label>Referral status
+          <select name="referral">
+            <option value="none">None</option>
+            <option value="previous">Previously referred</option>
+          </select>
+        </label>
+        <label class="check"><input name="chronic" type="checkbox"> Chronic condition</label>
+        <label class="check"><input name="missed" type="checkbox"> Missed scheduled visit</label>
+        <div class="full"><button class="btn" type="submit">Add patient &amp; calculate risk</button></div>
+      </form>
+    </div>
+
+    <div class="panel">
+      <h2>Patient Register</h2>
+      <input id="search" class="search" placeholder="Search by name, village or condition...">
+      <div class="table-wrap"><table id="patientTable"></table></div>
+    </div>
+  </section>
+
+  <!-- WORKERS -->
+  <section id="workers" class="view">
+    <div class="panel">
+      <h2>Add ASHA / ANM Worker</h2>
+      <form id="workerForm" class="grid">
+        <label>Name* <input name="name" required></label>
+        <label>Type
+          <select name="type"><option>ASHA</option><option>ANM</option></select>
+        </label>
+        <label>Village <input name="village"></label>
+        <label>Phone <input name="phone" type="tel"></label>
+        <label>Availability
+          <select name="available"><option value="1">Available</option><option value="0">On leave</option></select>
+        </label>
+        <label>Max visits / day (1-8) <input name="max" type="number" min="1" max="8" value="8"></label>
+        <div class="full"><button class="btn" type="submit">Add worker</button></div>
+      </form>
+    </div>
+    <div class="panel">
+      <h2>Workers</h2>
+      <div class="table-wrap"><table id="workerTable"></table></div>
+    </div>
+  </section>
+
+  <!-- SCHEDULE -->
+  <section id="schedule" class="view">
+    <div class="panel">
+      <h2>Visit Schedule</h2>
+      <p class="muted">Pending patients are assigned highest risk first. Workers from the same village are preferred, then the least-loaded worker. Daily capacity is respected; overflow moves to the next day.</p>
+      <button class="btn" id="genBtn">Generate smart schedule</button>
+      <button class="btn secondary" id="resetBtn">Reset schedule</button>
+      <button class="btn secondary" onclick="window.print()">Print</button>
+      <div class="table-wrap"><table id="scheduleTable"></table></div>
+    </div>
+  </section>
+
+  <!-- ALGORITHM -->
+  <section id="algorithm" class="view">
+    <div class="panel">
+      <h2>Risk Scoring Algorithm</h2>
+      <p class="note"><strong>Important:</strong> These numbers are this prototype's prioritization algorithm. They are <u>not</u> an official clinical scoring system.</p>
+      <p><em>Risk Score = Medical Risk + Visit Urgency + Missed Visit + Vulnerability + Follow-up Risk</em> (capped at 100)</p>
+      <table id="ruleTable"></table>
+      <h3>Priority levels</h3>
+      <ul class="levels">
+        <li><span class="badge high">70-100</span> Critical / High Priority</li>
+        <li><span class="badge medium">40-69</span> Medium Priority</li>
+        <li><span class="badge low">0-39</span> Low Priority</li>
+      </ul>
+    </div>
+  </section>
+</main>
+
+<footer>Prototype for academic submission &mdash; data is stored only in your browser (localStorage). Not for clinical use.</footer>
+<script src="app.js"></script>
+</body>
+</html>
